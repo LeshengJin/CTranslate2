@@ -41,6 +41,9 @@ def _maybe_add_library_root(lib_name):
 
 _maybe_add_library_root("CTRANSLATE2")
 
+# print(include_dirs)
+# print(library_dirs)
+
 cflags = ["-std=c++17", "-fvisibility=hidden"]
 ldflags = []
 package_data = {}

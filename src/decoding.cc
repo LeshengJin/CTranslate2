@@ -1,5 +1,6 @@
 #include "ctranslate2/decoding.h"
 
+#include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -799,11 +800,16 @@ namespace ctranslate2 {
 
     for (dim_t step = 0; step < max_step; ++step) {
       convert_to_original_word_ids(decoder, sample_from);
+      auto start_time = std::chrono::high_resolution_clock::now();
       decoder(start_step + step,
               sample_from.to(device),
               state,
               &logits,
               gather_attention ? &attention_step_device : nullptr);
+      synchronize_stream(device);
+      auto end_time = std::chrono::high_resolution_clock::now();
+      auto total_time_us = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+      std::cout << total_time_us.count() * 1e-3 << std::endl;
 
       DisableTokens disable_tokens(logits);
 

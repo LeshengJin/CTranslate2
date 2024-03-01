@@ -1,6 +1,7 @@
 #include "ctranslate2/models/whisper.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include "ctranslate2/decoding.h"
 
@@ -88,6 +89,7 @@ namespace ctranslate2 {
       features.move_to(device, dtype);
 
       StorageView encoder_output(dtype, device);
+      auto start_time = std::chrono::high_resolution_clock::now();
       (*_encoder)(features, encoder_output);
 
       if (to_cpu) {
@@ -98,6 +100,10 @@ namespace ctranslate2 {
 
       // Ensure all operations are finished before returning the output.
       synchronize_stream(device);
+
+      auto end_time = std::chrono::high_resolution_clock::now();
+      auto total_time_us = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+      std::cout << "encode " << total_time_us.count() * 1e-3 << std::endl;
 
       return encoder_output;
     }
